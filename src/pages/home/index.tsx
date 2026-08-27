@@ -1,29 +1,57 @@
+import {useEffect, useState} from 'react'
 import { BsCartPlus} from 'react-icons/bs'
 
+import {api} from '../../services/api'
+
+interface ProductProps{
+    id: number;
+    title: string;
+    description: string;
+    price: number;
+    cover: string;
+}
+
 export function Home(){
+    const [products, setProducts] = useState<ProductProps[]>([])
+
+    useEffect(() => {
+        async function getProducts(){
+            const response = await api.get("/products")
+            setProducts(response.data)
+        }
+
+        getProducts();
+    }, [])
+
+
     return(
         <main className="w-full max-w-7xl px-4 mx-auto">
         <h1 className="font-bold text-2xl mb-4 mt-10 text-center">Produtos em alta</h1>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-5">
-            <section className="w-full">
-                <img
-                 className="w-full rounded-lg max-h-70 mb-2"
-                 src="https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/airpods-4-select-202409_FV1_FMT_WHH?wid=752&hei=636&fmt=jpeg&qlt=90&.v=WnVKRVRUTFVsYThXaWkydWViL1Q3YmRudmFtWnZKZ0szeGF4cDZsczlhOWU5bTRrM1hZbmw5eCtiRXdXMENIbGg5cFlXTXBPaHRzU3RjRTMyRlg3eTd0UkdMSDBFQ1ZUdTNVa3daQmFjd1hvRUpUejJXeHlMOSsrLy9ZbWFSbmo"
-                 alt="Logo do produto" 
-                 />
-                 <p className="font-medium mt-1 mb-2">Airpods Pro</p>
+           {products.map( (product) =>(
+             <section key={product.id} className="w-full">
+            <img
+                className="w-full rounded-lg max-h-70 mb-2" 
+                src= {product.cover}
+                alt={product.title}
+                />
+                <p className="font-medium mt-1 mb-2">{product.title}</p>
 
-                 <div className="flex gap-3 items-center">
-                    <strong className="text-zinc-700/90">
-                        R$ 1000,00
-                    </strong>
-                    <button className="bg-zinc-900 p-1 rounded">
-                        <BsCartPlus size={20} color="#FFF"/> 
-                    </button>
-                 </div>
+                <div className="flex gap-3 items-center">
+                <strong className="text-zinc-700/90">
+                    {product.price.toLocaleString('pt-BR',{
+                        style: "currency",
+                        currency:"BRL"
+                    })}
+                </strong>
+                <button className="bg-zinc-900 p-1 rounded">
+                    <BsCartPlus size={20} color="#FFF"/> 
+                </button>
+                </div>
 
             </section>
+           ))}
         </div>
 
         </main>
